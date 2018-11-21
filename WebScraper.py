@@ -2,12 +2,13 @@ import datetime
 import pandas as pd
 import numpy as np
 from datetime import datetime as dt
+import re
 
 start_time = input('What time do you start your day? ')
 end_time = input('What time do you end your day? ')
 
-start_time = dt.strptime(start_time, '%H:%M')
-end_time = dt.strptime(end_time, '%H:%M')
+start_time = dt.strptime(start_time, '%H:%M').time()
+end_time = dt.strptime(end_time, '%H:%M').time()
 
 today = datetime.datetime.today().strftime('%d %B %Y')
 tomorrow = (datetime.datetime.today() + datetime.timedelta(days=1)).strftime('%d %B %Y')
@@ -20,19 +21,13 @@ cutoff = pd_table.index[pd_table['Time'] == tomorrow].tolist()[0]
 
 curr_table = pd_table.iloc[1:cutoff,:]
 
-print(curr_table)
-#
-# curr_table['Time'] = pd.to_datetime(curr_table['Time'])
-#
-# user_times = curr_table[(curr_table['Time'] >= start_time) & (curr_table['Time'] <= end_time)]
-# print(user_times)
+curr_table.loc[:,'Time'] = pd.to_datetime(curr_table['Time'], format='%H:%M').dt.time
 
-# print(len(rows))
-# print(rows[0:8])
+user_times = curr_table[(curr_table['Time'] >= start_time) & (curr_table['Time'] <= end_time)]
 
-
-
-# print(len(columns))
-# print(columns[0:2])
-
-# print(soup.prettify())
+if ('High' in str(user_times['Likelihood of Precip'])) & (('Showers' in str(user_times['Weather Conditions'])) | ('showers' in str(user_times['Weather Conditions']))):
+    print('Bring your umbrella and wear rain boots')
+elif ('Medium' in str(user_times['Likelihood of Precip'])) & (('Showers' in str(user_times['Weather Conditions'])) | ('showers' in str(user_times['Weather Conditions']))):
+    print('Bring your umbrella')
+else:
+    print("Don't need your umbrella today")
